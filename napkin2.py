@@ -55,11 +55,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.velocity
             
 class Scissors(pygame.sprite.Sprite):
-    def __init__(self,texture):
+    def __init__(self,texture,x,y,w,h):
         #pygame.sprite.Sprite.__init__(self)
-        super(Player,self).__init__()
+        super(Scissors,self).__init__()
         self.image = texture
-        self.rect = self.image.get_rect()
+        self.rect = Rect(x,y,w,h)#self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(1, 8)
@@ -71,12 +71,16 @@ class Scissors(pygame.sprite.Sprite):
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 8)
-            
+
+    def draw(self, surface):
+        print(self.rect)
+        surface.blit(self.image, self.rect)        
 '''mobs = pygame.sprite.Group()
 for i in range(8):
     m = Scissors()
     #all_sprites.add(m)
-    mobs.add(m)'''
+    mobs.add(m)'''#i didnt understand this part of code
+    
 
 
 class Scene:
@@ -92,8 +96,8 @@ class Scene:
         Player.load_images()
         self.background = pygame.image.load('bg1.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, self.rect.size)
-        #self.player = Player(300, 410, 64, 64)
-        #self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha())
+        self.player = Player(300, 410, 64, 64)
+        self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
  
     def mainloop(self):
         self.running = True
@@ -104,24 +108,24 @@ class Scene:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         print("moveLeft")
-                        #self.player.move_left()
+                        self.player.move_left()
                     elif event.key == pygame.K_d:
                         print("moveRight")
-                        #self.player.move_right(self.rect.width)
+                        self.player.move_right(self.rect.width)
  
             ticks = pygame.time.get_ticks()
             keys = pygame.key.get_pressed()
  
-            '''if self.player.can_move(ticks):
+            if self.player.can_move(ticks):
                 if keys[pygame.K_LEFT]:
                     self.player.move_left()
                 elif keys[pygame.K_RIGHT]:
-                    self.player.move_right(self.rect.width)'''
+                    self.player.move_right(self.rect.width)
  
             # drawing
             self.surface.blit(self.background, (0,0))
-            #self.player.draw(self.surface)
-            #self.scissors.draw(self.surface)
+            self.player.draw(self.surface)
+            self.scissors.draw(self.surface)
  
             # draw code here
  
