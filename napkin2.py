@@ -60,20 +60,47 @@ class Scissors(pygame.sprite.Sprite):
         super(Scissors,self).__init__()
         self.image = texture
         self.rect = Rect(x,y,w,h)#self.image.get_rect()
-        self.rect.x = random.randrange(WIDTH - self.rect.width)
-        self.rect.y = random.randrange(-100, -40)
+        #self.rect.x = random.randrange(WIDTH - self.rect.width)
+        #self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(1, 8)
         self.speedx = random.randrange(-3, 3)
 
     def update(self):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10:
-            self.rect.x = random.randrange(WIDTH - self.rect.width)
-            self.rect.y = random.randrange(-100, -40)
+            #self.rect.x = random.randrange(WIDTH - self.rect.width)
+            #self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 8)
 
     def draw(self, surface):
-        print(self.rect)
+        #print(self.rect)
+        surface.blit(self.image, self.rect)        
+'''mobs = pygame.sprite.Group()
+for i in range(8):
+    m = Scissors()
+    #all_sprites.add(m)
+    mobs.add(m)'''#i didnt understand this part of code
+
+class Rock(pygame.sprite.Sprite):
+    def __init__(self,texture,x,y,w,h):
+        #pygame.sprite.Sprite.__init__(self)
+        super(Rock,self).__init__()
+        self.image = texture
+        self.rect = Rect(x,y,w,h)#self.image.get_rect()
+        #self.rect.x = random.randrange(WIDTH - self.rect.width)
+        #self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(1, 8)
+        self.speedx = random.randrange(-3, 3)
+
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10:
+            #self.rect.x = random.randrange(WIDTH - self.rect.width)
+            #self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 8)
+
+    def draw(self, surface):
+        #print(self.rect)
         surface.blit(self.image, self.rect)        
 '''mobs = pygame.sprite.Group()
 for i in range(8):
@@ -98,6 +125,7 @@ class Scene:
         self.background = pygame.transform.scale(self.background, self.rect.size)
         self.player = Player(300, 410, 64, 64)
         self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
+        self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
  
     def mainloop(self):
         self.running = True
@@ -121,11 +149,15 @@ class Scene:
                     self.player.move_left()
                 elif keys[pygame.K_RIGHT]:
                     self.player.move_right(self.rect.width)
+            self.scissors.update()
+            self.Rock.update()
+         
  
             # drawing
             self.surface.blit(self.background, (0,0))
             self.player.draw(self.surface)
             self.scissors.draw(self.surface)
+            self.Rock.draw(self.surface)
  
             # draw code here
  
