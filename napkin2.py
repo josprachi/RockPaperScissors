@@ -23,10 +23,10 @@ class Player(pygame.sprite.Sprite):
         super(Player,self).__init__()
         self.image=self.images[0]
         self.rect = pygame.Rect(x, y, w, h)
-        self.velocity = 5
+        self.velocity = 10#5
         self.is_jumping = False
         self.jump_count = 5
-        self.walk_left = 0, 2       # self.walk_left == (0, 2)
+        self.walk_left = 0, 2
         self.walk_right = 0, 1
         self.walk_count = 0
         self.walk_pos = 0
@@ -55,25 +55,23 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.velocity
             
 class Scissors(pygame.sprite.Sprite):
-    def __init__(self,texture,x,y,w,h):
-        #pygame.sprite.Sprite.__init__(self)
+    def __init__(self,texture,x,y,w,h):        
         super(Scissors,self).__init__()
         self.image = texture
-        self.rect = Rect(x,y,w,h)#self.image.get_rect()
-        #self.rect.x = random.randrange(WIDTH - self.rect.width)
+        self.rect = Rect(x,y,w,h)
+        self.rect.x = random.randrange(100,WIDTH - self.rect.width)
         #self.rect.y = random.randrange(-100, -40)
-        self.speedy = random.randrange(1, 8)
+        self.speedy = random.randrange(1, 15)
         self.speedx = random.randrange(-3, 3)
 
     def update(self):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10:
-            #self.rect.x = random.randrange(WIDTH - self.rect.width)
-            #self.rect.y = random.randrange(-100, -40)
-            self.speedy = random.randrange(1, 8)
+            self.rect.x = random.randrange(100,WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 15)
 
     def draw(self, surface):
-        #print(self.rect)
         surface.blit(self.image, self.rect)        
 '''mobs = pygame.sprite.Group()
 for i in range(8):
@@ -95,9 +93,9 @@ class Rock(pygame.sprite.Sprite):
     def update(self):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 10:
-            #self.rect.x = random.randrange(WIDTH - self.rect.width)
-            #self.rect.y = random.randrange(-100, -40)
-            self.speedy = random.randrange(1, 8)
+            self.rect.x = random.randrange(WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 15)
 
     def draw(self, surface):
         #print(self.rect)
@@ -115,7 +113,7 @@ class Scene:
         pygame.init()
         # basic pygame setup
         pygame.display.set_caption('Napkin Move')
-        self.rect = pygame.Rect(0, 0, 1364, 500)
+        self.rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
         self.surface = pygame.display.set_mode(self.rect.size)
         self.clock = pygame.time.Clock()
  
@@ -123,7 +121,7 @@ class Scene:
         Player.load_images()
         self.background = pygame.image.load('bg1.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, self.rect.size)
-        self.player = Player(300, 410, 64, 64)
+        self.player = Player(300, HEIGHT-100, 64, 64)
         self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
  
