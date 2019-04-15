@@ -124,6 +124,9 @@ class Scene:
         self.player = Player(300, HEIGHT-100, 64, 64)
         self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
+
+        self.Scorefont = pygame.font.SysFont(None, 42)
+        self.Scoretext=self.Scorefont.render("0", True,(255,0,0))
  
     def mainloop(self):
         self.running = True
@@ -156,6 +159,7 @@ class Scene:
             self.player.draw(self.surface)
             self.scissors.draw(self.surface)
             self.Rock.draw(self.surface)
+            self.surface.blit(self.Scoretext,(20,20))
  
             # draw code here
  
