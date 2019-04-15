@@ -126,7 +126,7 @@ class Scene:
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
 
         self.Scorefont = pygame.font.SysFont(None, 42)
-        self.Scoretext=self.Scorefont.render("0", True,(255,0,0))
+        self.Scoretext = self.Scorefont.render("0", True,(255,0,0))
  
     def mainloop(self):
         self.running = True
