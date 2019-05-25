@@ -4,6 +4,7 @@ import random
 
 WIDTH = 800
 HEIGHT = 640
+RockCount = [0]
 
 #this is for test commit 
  
@@ -73,38 +74,27 @@ class Scissors(pygame.sprite.Sprite):
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)        
-'''mobs = pygame.sprite.Group()
-for i in range(8):
-    m = Scissors()
-    #all_sprites.add(m)
-    mobs.add(m)'''#i didnt understand this part of code
 
 class Rock(pygame.sprite.Sprite):
     def __init__(self,texture,x,y,w,h):
-        #pygame.sprite.Sprite.__init__(self)
         super(Rock,self).__init__()
         self.image = texture
-        self.rect = Rect(x,y,w,h)#self.image.get_rect()
-        #self.rect.x = random.randrange(WIDTH - self.rect.width)
-        #self.rect.y = random.randrange(-100, -40)
+        self.rect = Rect(x,y,w,h)
         self.speedy = random.randrange(1, 8)
         self.speedx = random.randrange(-3, 3)
+        self.collected = False
 
     def update(self):
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10:
+        if (self.rect.top > HEIGHT + 10 or self.collected):
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 15)
+            self.collected = False
 
     def draw(self, surface):
         #print(self.rect)
         surface.blit(self.image, self.rect)        
-'''mobs = pygame.sprite.Group()
-for i in range(8):
-    m = Scissors()
-    #all_sprites.add(m)
-    mobs.add(m)'''#i didnt understand this part of code
     
 
 
@@ -152,6 +142,11 @@ class Scene:
                     self.player.move_right(self.rect.width)
             self.scissors.update()
             self.Rock.update()
+            if pygame.sprite.collide_rect(self.player, self.Rock):
+                self.Rock.collected = True
+                RockCount[0] += 1
+                print("Collision happend")
+                self.Scoretext = self.Scorefont.render(str(RockCount[0]), True,(255,0,0))
          
  
             # drawing
