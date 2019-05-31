@@ -19,6 +19,7 @@ class Player(pygame.sprite.Sprite):
             pygame.image.load('napkin1.png').convert_alpha(),
             pygame.image.load('napkin2.png').convert_alpha(),
             pygame.image.load('napkin3.png').convert_alpha()]
+        cls.heartImage= pygame.image.load('heart.png').convert_alpha()    
  
     def __init__(self, x, y, w, h):
         super(Player,self).__init__()
