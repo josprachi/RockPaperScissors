@@ -128,6 +128,8 @@ class Scene:
 
         self.Scorefont = pygame.font.SysFont(None, 42)
         self.Scoretext = self.Scorefont.render("0", True,(255,0,0))
+        #self.Lifefont = pygame.font.SysFont(None, 42)
+        self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
  
     def mainloop(self):
         self.running = True
@@ -169,6 +171,7 @@ class Scene:
                     self.life -= 10
                     print(self.life)
                     self.player.get_hurt()
+                   
                     #self.heartImg.set_alpha((255*self.life)/10000)
                       
          
@@ -180,6 +183,8 @@ class Scene:
             self.Rock.draw(self.surface)
             self.surface.blit(self.Scoretext,(20,20))
             self.surface.blit(self.heartImg,(WIDTH*0.8,20))
+            self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
+            self.surface.blit(self.Lifetext,(WIDTH*0.8+self.heartImg.get_width(),20))
  
             # draw code here
  
