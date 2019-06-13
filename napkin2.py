@@ -18,8 +18,8 @@ class Player(pygame.sprite.Sprite):
         cls.images = [
             pygame.image.load('napkin1.png').convert_alpha(),
             pygame.image.load('napkin2.png').convert_alpha(),
-            pygame.image.load('napkin3.png').convert_alpha()]
-        cls.heartImage= pygame.image.load('heart.png').convert_alpha()    
+            pygame.image.load('napkin3.png').convert_alpha(),
+            pygame.image.load('napkin4.png').convert_alpha()]
  
     def __init__(self, x, y, w, h):
         super(Player,self).__init__()
@@ -32,8 +32,10 @@ class Player(pygame.sprite.Sprite):
         self.walk_right = 0, 1
         self.walk_count = 0
         self.walk_pos = 0
+        self.walk_cut = 0,3
         self.tick = 100
         self.next_tick = 100
+        self.hurt = False
  
     def can_move(self, ticks):
         if ticks > self.tick:
@@ -43,6 +45,9 @@ class Player(pygame.sprite.Sprite):
  
     def draw(self, surface):
         surface.blit(Player.images[self.walk_pos], self.rect)
+    
+    def get_hurt(self):
+        self.walk_pos = self.walk_cut[1]
  
     def move_left(self):
         if self.rect.x > self.velocity:
@@ -65,13 +70,15 @@ class Scissors(pygame.sprite.Sprite):
         #self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(1, 15)
         self.speedx = random.randrange(-3, 3)
+        self.collected = False
 
     def update(self):
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10:
+        if (self.rect.top > HEIGHT + 10)or (self.collected):
             self.rect.x = random.randrange(100,WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 15)
+            self.collected = False
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)        
@@ -87,7 +94,7 @@ class Rock(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.speedy
-        if (self.rect.top > HEIGHT + 10 or self.collected):
+        if (self.rect.top > HEIGHT + 10) or (self.collected):
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 15)
@@ -107,11 +114,14 @@ class Scene:
         self.rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
         self.surface = pygame.display.set_mode(self.rect.size)
         self.clock = pygame.time.Clock()
+        self.life = 100
  
         # Scene setup
         Player.load_images()
         self.background = pygame.image.load('bg1.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, self.rect.size)
+        self.heartImg = pygame.image.load('heart.png').convert_alpha()
+        self.heartImg = pygame.transform.scale(self.heartImg,(50,50))
         self.player = Player(300, HEIGHT-100, 64, 64)
         self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
@@ -143,11 +153,24 @@ class Scene:
                     self.player.move_right(self.rect.width)
             self.scissors.update()
             self.Rock.update()
-            if pygame.sprite.collide_rect(self.player, self.Rock):
+            if pygame.sprite.collide_circle(self.player, self.Rock):
                 self.Rock.collected = True
                 RockCount[0] += 1
                 print("Collision happend")
                 self.Scoretext = self.Scorefont.render(str(RockCount[0]), True,(255,0,0))
+                if self.life < 100:
+                    self.life += 10
+                    #self.heartImg.set_alpha((255*self.life)/10000)
+                    
+            if pygame.sprite.collide_rect_ratio(1.5)(self.player,self.scissors):
+                self.scissors.collected = True                
+                print("Collision happend with scissors")                
+                if self.life > 0:
+                    self.life -= 10
+                    print(self.life)
+                    self.player.get_hurt()
+                    #self.heartImg.set_alpha((255*self.life)/10000)
+                      
          
  
             # drawing
@@ -156,6 +179,7 @@ class Scene:
             self.scissors.draw(self.surface)
             self.Rock.draw(self.surface)
             self.surface.blit(self.Scoretext,(20,20))
+            self.surface.blit(self.heartImg,(WIDTH*0.8,20))
  
             # draw code here
  
