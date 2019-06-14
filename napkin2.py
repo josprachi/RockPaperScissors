@@ -105,6 +105,7 @@ class Rock(pygame.sprite.Sprite):
         surface.blit(self.image, self.rect)        
     
 
+#class HUD(pygame.sprite.sprite):
 
 class Scene:
     def __init__(self):
