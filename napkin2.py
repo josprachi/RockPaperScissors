@@ -5,6 +5,7 @@ import random
 WIDTH = 800
 HEIGHT = 640
 RockCount = [0]
+isGameRunning = False
 
 #this is for test commit 
  
@@ -33,8 +34,8 @@ class Player(pygame.sprite.Sprite):
         self.walk_count = 0
         self.walk_pos = 0
         self.walk_cut = 0,3
-        self.tick = 100
-        self.next_tick = 100
+        self.tick = 10
+        self.next_tick = 10
         self.hurt = False
  
     def can_move(self, ticks):
@@ -74,7 +75,7 @@ class Scissors(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.speedy
-        if (self.rect.top > HEIGHT + 10)or (self.collected):
+        if (self.rect.top > HEIGHT + 10) or (self.collected):
             self.rect.x = random.randrange(100,WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 15)
@@ -104,8 +105,30 @@ class Rock(pygame.sprite.Sprite):
         #print(self.rect)
         surface.blit(self.image, self.rect)        
     
+class Menu(pygame.sprite.Sprite):
+    def __init__(self):
+        super(self).__init__()
+        print("Menu init")
+        
+class HUD(pygame.sprite.Sprite):
+    @classmethod
+    def load_images(cls):
+        cls.BkgTexture = pygame.image.load('HudBar.png').convert_alpha()
+        cls.BkgTexture=pygame.transform.scale(cls.BkgTexture,(WIDTH,HEIGHT/8))
+        cls.ClockImg = pygame.image.load('Clock.png').convert_alpha()
+        cls.ClockImg = pygame.transform.scale(cls.ClockImg,(50,50))
 
-#class HUD(pygame.sprite.sprite):
+    def __init__(self,x = 0, y = 0, width = 1, height = 1):
+        super(HUD,self).__init__()		
+        self.image = self.BkgTexture
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.rect = self.image.get_rect()
+    def draw(self,surface):
+        surface.blit(self.image,self.rect)
+        self.image.blit(self.ClockImg,(self.image.get_width()*0.5,20))
 
 class Scene:
     def __init__(self):
@@ -116,9 +139,11 @@ class Scene:
         self.surface = pygame.display.set_mode(self.rect.size)
         self.clock = pygame.time.Clock()
         self.life = 100
+        self.gameOver=False
  
         # Scene setup
         Player.load_images()
+        HUD.load_images()
         self.background = pygame.image.load('bg1.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, self.rect.size)
         self.heartImg = pygame.image.load('heart.png').convert_alpha()
@@ -127,6 +152,8 @@ class Scene:
         self.scissors = Scissors(pygame.image.load('scissors.png').convert_alpha(),10, 100, 64, 64)
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
 
+        self.HUD = HUD (300, 300, 64, 64)
+
         self.Scorefont = pygame.font.SysFont(None, 42)
         self.Scoretext = self.Scorefont.render("0", True,(255,0,0))
         #self.Lifefont = pygame.font.SysFont(None, 42)
@@ -134,6 +161,7 @@ class Scene:
  
     def mainloop(self):
         self.running = True
+
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -161,9 +189,7 @@ class Scene:
                 RockCount[0] += 1
                 print("Collision happend")
                 self.Scoretext = self.Scorefont.render(str(RockCount[0]), True,(255,0,0))
-                if self.life < 100:
-                    self.life += 10
-                    #self.heartImg.set_alpha((255*self.life)/10000)
+                
                     
             if pygame.sprite.collide_rect_ratio(1.5)(self.player,self.scissors):
                 self.scissors.collected = True                
@@ -172,7 +198,8 @@ class Scene:
                     self.life -= 10
                     print(self.life)
                     self.player.get_hurt()
-                   
+                    if self.life < 10:
+                        self.gameOver = True
                     #self.heartImg.set_alpha((255*self.life)/10000)
                       
          
@@ -182,10 +209,12 @@ class Scene:
             self.player.draw(self.surface)
             self.scissors.draw(self.surface)
             self.Rock.draw(self.surface)
+            #if self.gameOver:
+            self.HUD.draw(self.surface)
             self.surface.blit(self.Scoretext,(20,20))
             self.surface.blit(self.heartImg,(WIDTH*0.8,20))
             self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
-            self.surface.blit(self.Lifetext,(WIDTH*0.8+self.heartImg.get_width(),20))
+            self.surface.blit(self.Lifetext,(WIDTH*0.8,20))
  
             # draw code here
  
