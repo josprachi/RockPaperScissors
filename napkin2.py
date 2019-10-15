@@ -109,6 +109,7 @@ class Menu(pygame.sprite.Sprite):
     @classmethod
     def load_images(cls):
         cls.MenuTexture = pygame.image.load('hudboard.png').convert_alpha()
+        cls.MenuTexture = pygame.transform.scale(cls.MenuTexture,(450,400))
         cls.HelpTextures = [
             pygame.image.load('HelpBtn.png').convert_alpha(),
             pygame.image.load('HelpBtn_Red.png').convert_alpha(),
@@ -130,12 +131,68 @@ class Menu(pygame.sprite.Sprite):
             pygame.image.load('RestartBtn_Grey.png').convert_alpha(),
         ]
 
-    def __init__(self):
+    def __init__(self,x,y,w,h):
         super(Menu,self).__init__()
-        self.image=self.MenuTexture
-
-        print("Menu init")
+        self.image=self.MenuTexture        
+        self.visible = True
+        self.active = True
+        self.rect = Rect(x,y,w,h)
         
+
+    def update(self):
+        self.visible = True        
+
+    def draw(self, surface):
+        #print(self.rect)
+        if self.visible:
+            surface.blit(self.image, self.rect)    
+
+class MenuButton(pygame.sprite.Sprite):
+    def __init__(self,originalImg,HoverImg,DisabledImg,x,y,w,h):
+        self.originalImg = originalImg
+        self.HoverImg = HoverImg
+        self.DisabledImg = DisabledImg
+        self.image =self.originalImg
+        self.x = x
+        self.y = y
+        self.disabled=False
+        self.rect=Rect(x,y,w,h)
+    
+    def detectHover(self):
+        mouse = pygame.mouse.get_pos()
+        if self.x+100 > mouse[0] > self.x and self.y+50 > mouse[1] > self.y:
+            self.image=self.HoverImg
+            self.onClick()
+            #print(mouse)
+        else:
+            self.image=self.originalImg
+
+    def setDisabled(self,_isDisabled = False):
+        self.disabled=_isDisabled
+        if self.disabled:
+            self.image = self.DisabledImg
+        else:
+            self.image = self.originalImg    
+
+    def onClick(self):
+        click = pygame.mouse.get_pressed()
+        if click[0] == 1:
+            print("button clicked")
+
+    def update(self):
+        if self.disabled == False:
+            self.detectHover()        
+
+    def draw(self, surface):
+        #print(self.rect)
+        surface.blit(self.image, self.rect)                    
+
+
+
+        
+
+
+
 class HUD(pygame.sprite.Sprite):
     @classmethod
     def load_images(cls):
@@ -186,6 +243,7 @@ class Scene:
         self.Rock = Rock(pygame.image.load('rock.png').convert_alpha(),400, 100, 64, 64)
 
         self.HUD = HUD (300, 300, 64, 64)
+        self.Menu = Menu (WIDTH/4, HEIGHT/3, 100,100)
 
         self.Scorefont = pygame.font.SysFont(None, 42)
         self.Scoretext = self.Scorefont.render("0", True,(255,0,0))
@@ -214,6 +272,7 @@ class Scene:
             self.Rock.draw(self.surface)
             #if self.gameOver:
             self.HUD.draw(self.surface)
+            self.Menu.draw(self.surface)
             self.surface.blit(self.Scoretext,(20,20))
             self.surface.blit(self.heartImg,(WIDTH*0.8,20))
             self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
@@ -223,23 +282,25 @@ class Scene:
  
             pygame.display.flip()
 
+    def handleEvents(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:                    
+                    self.player.move_left()
+                elif event.key == pygame.K_d:
+                    self.player.move_right(self.rect.width)
+
     def mainloop(self):
         self.running = True
 
         while self.running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_a:
-                        print("moveLeft")
-                        self.player.move_left()
-                    elif event.key == pygame.K_d:
-                        print("moveRight")
-                        self.player.move_right(self.rect.width)
- 
+            self.handleEvents()
             ticks = pygame.time.get_ticks()
             keys = pygame.key.get_pressed()
+            
+            
             self.update_(ticks,keys)            
             self.scissors.update()
             self.Rock.update()
@@ -262,8 +323,6 @@ class Scene:
             self.renderScene_()
             self.clock.tick(30)
 
-
- 
 if __name__ == '__main__':
     scene = Scene()
     scene.mainloop()
