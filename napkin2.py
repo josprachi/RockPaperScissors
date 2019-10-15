@@ -106,8 +106,34 @@ class Rock(pygame.sprite.Sprite):
         surface.blit(self.image, self.rect)        
     
 class Menu(pygame.sprite.Sprite):
+    @classmethod
+    def load_images(cls):
+        cls.MenuTexture = pygame.image.load('hudboard.png').convert_alpha()
+        cls.HelpTextures = [
+            pygame.image.load('HelpBtn.png').convert_alpha(),
+            pygame.image.load('HelpBtn_Red.png').convert_alpha(),
+            pygame.image.load('HelpBtn_Grey.png').convert_alpha(),
+        ]
+        cls.PlayTextures = [
+            pygame.image.load('PlayBtn.png').convert_alpha(),
+            pygame.image.load('PlayBtn_Red.png').convert_alpha(),
+            pygame.image.load('PlayBtn_Grey.png').convert_alpha(),
+        ]
+        cls.PauseTextures = [
+            pygame.image.load('PauseBtn.png').convert_alpha(),
+            pygame.image.load('PauseBtn_Red.png').convert_alpha(),
+            pygame.image.load('PauseBtn_Grey.png').convert_alpha(),
+        ]
+        cls.RestartTextures = [
+            pygame.image.load('RestartBtn.png').convert_alpha(),
+            pygame.image.load('RestartBtn_Red.png').convert_alpha(),
+            pygame.image.load('RestartBtn_Grey.png').convert_alpha(),
+        ]
+
     def __init__(self):
-        super(self).__init__()
+        super(Menu,self).__init__()
+        self.image=self.MenuTexture
+
         print("Menu init")
         
 class HUD(pygame.sprite.Sprite):
