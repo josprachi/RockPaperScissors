@@ -161,15 +161,22 @@ class Scene:
         pygame.init()
         # basic pygame setup
         pygame.display.set_caption('Napkin Move')
+        self.initState() 
+        # Scene setup
+        Player.load_images()
+        HUD.load_images()
+        Menu.load_images()
+        self.loadAssets()
+
+    def initState(self):
         self.rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
         self.surface = pygame.display.set_mode(self.rect.size)
         self.clock = pygame.time.Clock()
         self.life = 100
-        self.gameOver=False
- 
-        # Scene setup
-        Player.load_images()
-        HUD.load_images()
+        self.gameOver = False
+        self.gamePaused = True
+
+    def loadAssets(self):
         self.background = pygame.image.load('bg1.png').convert_alpha()
         self.background = pygame.transform.scale(self.background, self.rect.size)
         self.heartImg = pygame.image.load('heart.png').convert_alpha()
@@ -184,7 +191,38 @@ class Scene:
         self.Scoretext = self.Scorefont.render("0", True,(255,0,0))
         #self.Lifefont = pygame.font.SysFont(None, 42)
         self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
+
+    def set_Pausegame(self):
+        self.pauseGame = not self.pauseGame
+
+    def set_GameOver(self):
+        self.gameOver= not self.gameOver
+
+    def update_(self,_ticks,_keys):
+        if self.gamePaused == True:            
+            if self.player.can_move(_ticks):
+                if _keys[pygame.K_LEFT]:
+                    self.player.move_left()
+                elif _keys[pygame.K_RIGHT]:
+                    self.player.move_right(self.rect.width)
+
+    def renderScene_(self):                    
+        # drawing
+            self.surface.blit(self.background, (0,0))
+            self.player.draw(self.surface)
+            self.scissors.draw(self.surface)
+            self.Rock.draw(self.surface)
+            #if self.gameOver:
+            self.HUD.draw(self.surface)
+            self.surface.blit(self.Scoretext,(20,20))
+            self.surface.blit(self.heartImg,(WIDTH*0.8,20))
+            self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
+            self.surface.blit(self.Lifetext,(WIDTH*0.8,20))
  
+            # draw code here
+ 
+            pygame.display.flip()
+
     def mainloop(self):
         self.running = True
 
@@ -202,49 +240,26 @@ class Scene:
  
             ticks = pygame.time.get_ticks()
             keys = pygame.key.get_pressed()
- 
-            if self.player.can_move(ticks):
-                if keys[pygame.K_LEFT]:
-                    self.player.move_left()
-                elif keys[pygame.K_RIGHT]:
-                    self.player.move_right(self.rect.width)
+            self.update_(ticks,keys)            
             self.scissors.update()
             self.Rock.update()
+
             if pygame.sprite.collide_circle(self.player, self.Rock):
                 self.Rock.collected = True
                 RockCount[0] += 1
-                print("Collision happend")
-                self.Scoretext = self.Scorefont.render(str(RockCount[0]), True,(255,0,0))
-                
+                self.Scoretext = self.Scorefont.render(str(RockCount[0]), True,(255,0,0))               
                     
             if pygame.sprite.collide_rect_ratio(1.5)(self.player,self.scissors):
-                self.scissors.collected = True                
-                print("Collision happend with scissors")                
+                self.scissors.collected = True
                 if self.life > 0:
                     self.life -= 10
                     print(self.life)
                     self.player.get_hurt()
                     if self.life < 10:
                         self.gameOver = True
-                    #self.heartImg.set_alpha((255*self.life)/10000)
-                      
-         
- 
+                   
             # drawing
-            self.surface.blit(self.background, (0,0))
-            self.player.draw(self.surface)
-            self.scissors.draw(self.surface)
-            self.Rock.draw(self.surface)
-            #if self.gameOver:
-            self.HUD.draw(self.surface)
-            self.surface.blit(self.Scoretext,(20,20))
-            self.surface.blit(self.heartImg,(WIDTH*0.8,20))
-            self.Lifetext = self.Scorefont.render("X "+str(self.life/10), True,(255,0,0))
-            self.surface.blit(self.Lifetext,(WIDTH*0.8,20))
- 
-            # draw code here
- 
-            pygame.display.flip()
+            self.renderScene_()
             self.clock.tick(30)
 
 
